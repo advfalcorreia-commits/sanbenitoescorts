@@ -6,7 +6,7 @@
 <title>Propuesta visual EPM</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;500&family=Jost:wght@300;400;500;600&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,400;8..60,600;8..60,700&family=Jost:wght@400;500;600;700&display=swap">
 <style>
 :root{
   --surface:#F5F1EA; --raised:#FBF8F3; --sunken:#EAE4DA; --inverse:#14110D;
@@ -205,6 +205,112 @@ footer ul a:hover{color:var(--brand)}
 @media (prefers-reduced-motion:reduce){
   *,*::before,*::after{animation-duration:.01ms!important;transition-duration:.01ms!important}
 }
+
+/* ─────────────────────────────────────────────────────────────
+   Revisión de legibilidad — 05/11
+   Cormorant Garamond en peso 300 y las etiquetas de 10,5 px
+   hacían el sitio difícil de leer. Serif de texto más firme,
+   cuerpos más grandes, grises más oscuros.
+   ───────────────────────────────────────────────────────────── */
+:root{
+  --display:"Source Serif 4","Iowan Old Style",Georgia,serif;
+  --ink-muted:#4A4136; --ink-faint:#5E5344;
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){ --ink-muted:#BDB3A2; --ink-faint:#A2988A }
+}
+:root[data-theme="dark"]{ --ink-muted:#BDB3A2; --ink-faint:#A2988A }
+
+body{font-size:17px; line-height:1.7}
+.display{font-weight:600}
+h1.hero-title{font-weight:600; letter-spacing:-.025em}
+h2.sec-title{font-weight:600}
+.wordmark{font-weight:600}
+.steps h3,.card-name h3,.panel-head .t,.brand-card .big{font-weight:600}
+.specimen{font-weight:600}
+
+.eyebrow{font-size:12.5px}
+nav.main a{font-size:12.5px}
+.langsw a{font-size:12px}
+.btn{font-size:12.5px}
+.btn-sm{font-size:12px}
+.trust li{font-size:13.5px}
+.sec-sub{font-size:14.5px}
+.more{font-size:12.5px}
+.card-ini{font-size:2.4rem}
+.badge{font-size:11.5px; padding:5px 11px}
+.card-name h3{font-size:1.35rem}
+.card-age{font-size:13px}
+.card-meta{font-size:13.5px}
+.card-price{font-size:13px}
+.steps .num{font-size:12.5px}
+.steps p{font-size:15px}
+.panel-head .st{font-size:12px}
+.msg{font-size:14.5px}
+.msg.sys{font-size:12.5px}
+.msg-form input{font-size:14.5px}
+.msg-form button{font-size:12px}
+.brand-card h4{font-size:11.5px}
+.brand-card p{font-size:13.5px}
+footer p.disc{font-size:14px}
+footer .wordmark{font-size:1.45rem}
+.demo-bar{font-size:12.5px}
+.lede{font-size:1.06rem}
+
+/* ── filtros de la selección ────────────────────────────────── */
+button.more{
+  font-family:var(--sans); background:none; border:0; padding:4px 0; cursor:pointer;
+  color:var(--brand); font-weight:500;
+}
+button.more:hover{color:var(--brand-strong)}
+.filters{display:flex; gap:8px; flex-wrap:wrap; margin:20px 0 4px; align-items:center}
+.fchip{
+  font-family:var(--sans); font-size:13px; font-weight:500; line-height:1;
+  border:1px solid var(--line-strong); background:var(--raised); color:var(--ink-muted);
+  border-radius:999px; padding:10px 15px; cursor:pointer; white-space:nowrap; min-height:38px;
+}
+.fchip:hover{color:var(--ink); border-color:var(--ink-faint)}
+.fchip.is-on{background:var(--ink-strong); border-color:var(--ink-strong); color:var(--surface)}
+.fchip:focus-visible{outline:2px solid var(--focus); outline-offset:2px}
+.fcount{margin-left:auto; font-size:13px; color:var(--ink-faint); font-variant-numeric:tabular-nums}
+
+.card.is-out{display:none}
+.card{transition:transform .18s ease, box-shadow .18s ease}
+.card:hover,.card:focus-visible{transform:translateY(-3px); box-shadow:0 10px 28px rgba(20,17,13,.13)}
+.card:focus-visible{outline:2px solid var(--focus); outline-offset:3px}
+
+/* ── cabecera con sombra al hacer scroll ────────────────────── */
+header.site.is-scrolled{box-shadow:0 1px 18px rgba(20,17,13,.10)}
+
+/* ── ficha de perfil (diálogo) ──────────────────────────────── */
+dialog.perfil{
+  border:1px solid var(--line); border-radius:6px; padding:0; max-width:440px; width:calc(100% - 32px);
+  background:var(--raised); color:var(--ink); box-shadow:0 24px 70px rgba(20,17,13,.34);
+}
+dialog.perfil::backdrop{background:rgba(20,17,13,.52); backdrop-filter:blur(3px)}
+.perfil-in{padding:24px 24px 22px}
+.perfil-img{height:180px; border-radius:4px; display:grid; place-items:center; margin-bottom:18px}
+.perfil-img span{font-family:var(--display); font-size:3rem; color:rgba(255,255,255,.9)}
+.perfil h3{font-family:var(--display); font-size:1.7rem; font-weight:600; margin:0}
+.perfil dl{display:grid; grid-template-columns:auto 1fr; gap:8px 16px; margin:16px 0 20px; font-size:14.5px}
+.perfil dt{color:var(--ink-faint); font-size:12px; letter-spacing:.08em; text-transform:uppercase; padding-top:3px}
+.perfil dd{margin:0}
+.perfil .row{display:flex; gap:10px; flex-wrap:wrap}
+.perfil .close{
+  position:absolute; top:12px; right:12px; width:34px; height:34px; border-radius:50%;
+  border:1px solid var(--line-strong); background:var(--surface); color:var(--ink);
+  cursor:pointer; font-size:16px; line-height:1; display:grid; place-items:center;
+}
+.perfil-in{position:relative}
+
+@media (max-width:640px){
+  .filters{gap:6px}
+  .fchip{font-size:12.5px; padding:9px 13px}
+  .fcount{flex:1 1 100%; margin-left:0; text-align:right}
+}
+@media print{
+  .filters,.demo-bar{display:none!important}
+}
 </style>
 </head>
 <body>
@@ -215,17 +321,17 @@ footer ul a:hover{color:var(--brand)}
   <div class="shell hrow">
     <a href="#" class="wordmark">EscortPorMadrid</a>
     <nav class="main" aria-label="Principal">
-      <a href="#seleccion">Acompañantes</a>
-      <a href="#proceso">Experiencias</a>
-      <a href="#marca">La agencia</a>
-      <a href="#concierge">Contacto</a>
+      <a href="#seleccion" data-i18n="navProfiles">Acompañantes</a>
+      <a href="#proceso" data-i18n="navExp">Experiencias</a>
+      <a href="#marca" data-i18n="navAbout">La agencia</a>
+      <a href="#concierge" data-i18n="navContact">Contacto</a>
     </nav>
     <div class="hright">
       <button class="theme-toggle" id="themeBtn" type="button" aria-label="Cambiar tema">◐</button>
       <div class="langsw" role="group" aria-label="Idioma">
-        <a href="#" aria-current="true">ES</a><a href="#">EN</a><a href="#">FR</a>
+        <a href="#" data-lang="es" aria-current="true">ES</a><a href="#" data-lang="en">EN</a><a href="#" data-lang="fr">FR</a>
       </div>
-      <a href="#concierge" class="btn btn-primary btn-sm">Hablar por WhatsApp</a>
+      <a href="#concierge" class="btn btn-primary btn-sm" data-i18n="ctaWhats">Hablar por WhatsApp</a>
     </div>
   </div>
 </header>
@@ -235,21 +341,21 @@ footer ul a:hover{color:var(--brand)}
   <section class="shell hero">
     <div class="hero-grid">
       <div>
-        <p class="eyebrow">Agencia de acompañamiento de lujo · Madrid</p>
-        <h1 class="display hero-title">Compañía elegida con criterio</h1>
+        <p class="eyebrow" data-i18n="heroEyebrow">Agencia de acompañamiento de lujo · Madrid</p>
+        <h1 class="display hero-title" data-i18n="heroTitle">Compañía elegida con criterio</h1>
         <hr class="rule-brand">
-        <p class="lede">
+        <p class="lede" data-i18n="heroLede">
           Una selección reducida de acompañantes verificadas en Madrid. Discreción absoluta,
           trato personal y reservas atendidas por personas reales.
         </p>
         <div class="ctas">
-          <a href="#seleccion" class="btn btn-primary">Ver la selección</a>
-          <a href="#concierge" class="btn btn-ghost">Hablar por WhatsApp</a>
+          <a href="#seleccion" class="btn btn-primary" data-i18n="ctaSee">Ver la selección</a>
+          <a href="#concierge" class="btn btn-ghost" data-i18n="ctaWhats">Hablar por WhatsApp</a>
         </div>
         <ul class="trust">
-          <li><svg width="12" height="12" viewBox="0 0 12 12" aria-hidden="true"><path d="M2.5 6.2l2.2 2.2L9.5 3.6" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>Verificación de identidad</li>
-          <li><svg width="12" height="12" viewBox="0 0 12 12" aria-hidden="true"><path d="M2.5 6.2l2.2 2.2L9.5 3.6" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>Discreción garantizada</li>
-          <li><svg width="12" height="12" viewBox="0 0 12 12" aria-hidden="true"><path d="M2.5 6.2l2.2 2.2L9.5 3.6" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>Atención 7 días</li>
+          <li><svg width="12" height="12" viewBox="0 0 12 12" aria-hidden="true"><path d="M2.5 6.2l2.2 2.2L9.5 3.6" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg><span data-i18n="trust1">Verificación de identidad</span></li>
+          <li><svg width="12" height="12" viewBox="0 0 12 12" aria-hidden="true"><path d="M2.5 6.2l2.2 2.2L9.5 3.6" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg><span data-i18n="trust2">Discreción garantizada</span></li>
+          <li><svg width="12" height="12" viewBox="0 0 12 12" aria-hidden="true"><path d="M2.5 6.2l2.2 2.2L9.5 3.6" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg><span data-i18n="trust3">Atención 7 días</span></li>
         </ul>
       </div>
       <div class="hero-figure">
@@ -266,14 +372,39 @@ footer ul a:hover{color:var(--brand)}
   <section class="shell blk" id="seleccion">
     <div class="sec-head">
       <div>
-        <h2 class="sec-title">Selección de acompañantes en Madrid</h2>
-        <p class="sec-sub">8 perfiles disponibles</p>
+        <h2 class="sec-title" data-i18n="selTitle">Selección de acompañantes en Madrid</h2>
+        <p class="sec-sub" data-i18n="selSub">8 perfiles disponibles</p>
       </div>
-      <a href="#" class="more">Ver todas →</a>
+      <button type="button" class="more" id="verTodas" aria-expanded="false">Ver todas →</button>
     </div>
     <hr class="rule">
+    <div class="filters" role="group" aria-label="Filtrar perfiles">
+      <button type="button" class="fchip is-on" data-filter="all" aria-pressed="true">Todas</button>
+      <button type="button" class="fchip" data-filter="live" aria-pressed="false">Disponibles ahora</button>
+      <button type="button" class="fchip" data-filter="appt" aria-pressed="false">Con cita previa</button>
+      <span class="fcount" id="fcount" aria-live="polite"></span>
+    </div>
     <div class="grid" id="cards"></div>
   </section>
+
+  <dialog class="perfil" id="perfil">
+    <div class="perfil-in">
+      <button type="button" class="close" id="perfilClose" aria-label="Cerrar">✕</button>
+      <div class="perfil-img" id="perfilImg"><span id="perfilIni">A</span></div>
+      <h3 id="perfilName">Amaya</h3>
+      <dl>
+        <dt>Edad</dt><dd id="perfilAge">27</dd>
+        <dt>Zona</dt><dd id="perfilArea">Salamanca</dd>
+        <dt>Nacionalidad</dt><dd id="perfilNat">Española</dd>
+        <dt>Tarifa</dt><dd id="perfilRate">desde 250 €</dd>
+        <dt>Disponibilidad</dt><dd id="perfilLive">Ahora</dd>
+      </dl>
+      <div class="row">
+        <a href="#concierge" class="btn btn-primary" id="perfilCta">Consultar por WhatsApp</a>
+        <button type="button" class="btn btn-ghost" id="perfilBack">Volver a la selección</button>
+      </div>
+    </div>
+  </dialog>
 
   <!-- PROCESO -->
   <section class="steps-band" id="proceso">
@@ -433,36 +564,182 @@ function gradient(h){
     : `linear-gradient(150deg,hsl(${h} 30% 74%) 0%,hsl(${h+18} 34% 60%) 58%,hsl(${h+36} 26% 46%) 100%)`;
 }
 
+/* ── Idioma ─────────────────────────────────────────────────── */
+const I18N = {
+  es:{
+    navProfiles:"Acompañantes", navExp:"Experiencias", navAbout:"La agencia", navContact:"Contacto",
+    ctaWhats:"Hablar por WhatsApp", ctaSee:"Ver la selección",
+    heroEyebrow:"Agencia de acompañamiento de lujo · Madrid",
+    heroTitle:"Compañía elegida con criterio",
+    heroLede:"Una selección reducida de acompañantes verificadas en Madrid. Discreción absoluta, trato personal y reservas atendidas por personas reales.",
+    trust1:"Verificación de identidad", trust2:"Discreción garantizada", trust3:"Atención 7 días",
+    selTitle:"Selección de acompañantes en Madrid", selSub:"8 perfiles disponibles",
+    seeAll:"Ver todas →", seeLess:"Ver menos ←",
+    fAll:"Todas", fLive:"Disponibles ahora", fAppt:"Con cita previa",
+    nOf:(v,t)=>`${v} de ${t} perfiles`,
+    live:"Disponible ahora", appt:"Con cita previa", from:"desde",
+    chatPh:"Escribe tu consulta…", dialogCta:"Consultar por WhatsApp", dialogBack:"Volver a la selección",
+    dAge:"Edad", dArea:"Zona", dNat:"Nacionalidad", dRate:"Tarifa", dLive:"Disponibilidad", dNow:"Ahora", dAppt:"Con cita"
+  },
+  en:{
+    navProfiles:"Companions", navExp:"Experiences", navAbout:"The agency", navContact:"Contact",
+    ctaWhats:"Chat on WhatsApp", ctaSee:"See the selection",
+    heroEyebrow:"Luxury companion agency · Madrid",
+    heroTitle:"Company, chosen with care",
+    heroLede:"A small, verified selection of companions in Madrid. Absolute discretion, personal attention and bookings handled by real people.",
+    trust1:"Identity verified", trust2:"Discretion guaranteed", trust3:"Available 7 days",
+    selTitle:"Companions in Madrid", selSub:"8 profiles available",
+    seeAll:"See all →", seeLess:"See less ←",
+    fAll:"All", fLive:"Available now", fAppt:"By appointment",
+    nOf:(v,t)=>`${v} of ${t} profiles`,
+    live:"Available now", appt:"By appointment", from:"from",
+    chatPh:"Write your enquiry…", dialogCta:"Ask on WhatsApp", dialogBack:"Back to the selection",
+    dAge:"Age", dArea:"Area", dNat:"Nationality", dRate:"Rate", dLive:"Availability", dNow:"Now", dAppt:"By appointment"
+  },
+  fr:{
+    navProfiles:"Accompagnantes", navExp:"Expériences", navAbout:"L'agence", navContact:"Contact",
+    ctaWhats:"Écrire sur WhatsApp", ctaSee:"Voir la sélection",
+    heroEyebrow:"Agence d'accompagnement de luxe · Madrid",
+    heroTitle:"Une compagnie choisie avec soin",
+    heroLede:"Une sélection restreinte d'accompagnantes vérifiées à Madrid. Discrétion absolue, attention personnelle et réservations traitées par de vraies personnes.",
+    trust1:"Identité vérifiée", trust2:"Discrétion garantie", trust3:"Disponible 7 jours",
+    selTitle:"Accompagnantes à Madrid", selSub:"8 profils disponibles",
+    seeAll:"Voir toutes →", seeLess:"Voir moins ←",
+    fAll:"Toutes", fLive:"Disponibles maintenant", fAppt:"Sur rendez-vous",
+    nOf:(v,t)=>`${v} sur ${t} profils`,
+    live:"Disponible maintenant", appt:"Sur rendez-vous", from:"à partir de",
+    chatPh:"Écrivez votre demande…", dialogCta:"Demander sur WhatsApp", dialogBack:"Retour à la sélection",
+    dAge:"Âge", dArea:"Quartier", dNat:"Nationalité", dRate:"Tarif", dLive:"Disponibilité", dNow:"Maintenant", dAppt:"Sur rendez-vous"
+  }
+};
+
+let LANG = 'es';
+try{ const savedLang = localStorage.getItem('demo-lang'); if(savedLang && I18N[savedLang]) LANG = savedLang; }catch(e){}
+const T = k => I18N[LANG][k];
+
+function applyLang(){
+  document.documentElement.lang = LANG;
+  document.querySelectorAll('[data-i18n]').forEach(el=>{
+    const v = I18N[LANG][el.dataset.i18n];
+    if(typeof v === 'string') el.textContent = v;
+  });
+  const inp = document.getElementById('chatInput');
+  if(inp) inp.placeholder = T('chatPh');
+  document.getElementById('verTodas').textContent = state.showAll ? T('seeLess') : T('seeAll');
+  document.querySelectorAll('.fchip[data-filter]').forEach(c=>{
+    c.textContent = {all:T('fAll'), live:T('fLive'), appt:T('fAppt')}[c.dataset.filter];
+  });
+  document.querySelectorAll('.langsw a').forEach(a=>{
+    if(a.dataset.lang === LANG) a.setAttribute('aria-current','true');
+    else a.removeAttribute('aria-current');
+  });
+  drawCards();
+}
+
+/* ── Selección ──────────────────────────────────────────────── */
 const cards = document.getElementById('cards');
+const counter = document.getElementById('fcount');
+let state = { filter:'all', showAll:false };
 
 function drawCards(){
-  cards.innerHTML = PROFILES.map(p=>{
+  const list = state.showAll ? PROFILES : PROFILES.slice(0,4);
+  cards.innerHTML = list.map(p=>{
+    const i = PROFILES.indexOf(p);
     const h = hue(p.n.toLowerCase());
-    return `<a href="#" class="card">
+    return `<a href="#perfil" class="card" data-i="${i}" data-live="${p.live?1:0}"
+      aria-label="${p.n}, ${p.a} ${T('dAge').toLowerCase()}, ${p.area}">
       <div class="card-img ph" style="background-image:${gradient(h)}">
         <span class="card-ini">${p.n.slice(0,1)}</span>
         <div class="card-badge">
           ${p.live
-            ? '<span class="badge badge-live">Disponible ahora</span>'
-            : '<span class="badge badge-appt">Con cita previa</span>'}
+            ? `<span class="badge badge-live">${T('live')}</span>`
+            : `<span class="badge badge-appt">${T('appt')}</span>`}
         </div>
       </div>
       <div class="card-body">
         <div class="card-name"><h3>${p.n}</h3><span class="card-age">${p.a}</span></div>
         <p class="card-meta">${p.nat} · ${p.area}</p>
-        <p class="card-price">desde <b>${p.rate} €</b></p>
+        <p class="card-price">${T('from')} <b>${p.rate} €</b></p>
       </div>
     </a>`;
   }).join('');
+  applyFilter();
 }
 
-/* Tema: preferência salva vence; o botão alterna */
+function applyFilter(){
+  const all = [...cards.querySelectorAll('.card')];
+  let visible = 0;
+  all.forEach(c=>{
+    const live = c.dataset.live === '1';
+    const ok = state.filter === 'all' || (state.filter === 'live' && live) || (state.filter === 'appt' && !live);
+    c.classList.toggle('is-out', !ok);
+    if(ok) visible++;
+  });
+  if(counter) counter.textContent = T('nOf')(visible, all.length);
+}
+
+document.querySelectorAll('.fchip[data-filter]').forEach(chip=>{
+  chip.addEventListener('click',()=>{
+    state.filter = chip.dataset.filter;
+    document.querySelectorAll('.fchip[data-filter]').forEach(c=>{
+      const on = c === chip;
+      c.classList.toggle('is-on', on);
+      c.setAttribute('aria-pressed', String(on));
+    });
+    applyFilter();
+  });
+});
+
+document.getElementById('verTodas').addEventListener('click', function(){
+  state.showAll = !state.showAll;
+  this.textContent = state.showAll ? T('seeLess') : T('seeAll');
+  this.setAttribute('aria-expanded', String(state.showAll));
+  drawCards();
+});
+
+/* ── Ficha de perfil ────────────────────────────────────────── */
+const perfil = document.getElementById('perfil');
+
+cards.addEventListener('click', e=>{
+  const card = e.target.closest('.card');
+  if(!card) return;
+  e.preventDefault();
+  const p = PROFILES[+card.dataset.i];
+  const h = hue(p.n.toLowerCase());
+  document.getElementById('perfilImg').style.backgroundImage = gradient(h);
+  document.getElementById('perfilIni').textContent = p.n.slice(0,1);
+  document.getElementById('perfilName').textContent = p.n;
+  document.getElementById('perfilAge').textContent = p.a;
+  document.getElementById('perfilArea').textContent = p.area;
+  document.getElementById('perfilNat').textContent = p.nat;
+  document.getElementById('perfilRate').textContent = `${T('from')} ${p.rate} €`;
+  document.getElementById('perfilLive').textContent = p.live ? T('dNow') : T('dAppt');
+  document.getElementById('perfilCta').textContent = T('dialogCta');
+  document.getElementById('perfilBack').textContent = T('dialogBack');
+  if(typeof perfil.showModal === 'function') perfil.showModal();
+});
+
+document.getElementById('perfilClose').addEventListener('click',()=>perfil.close());
+document.getElementById('perfilBack').addEventListener('click',()=>perfil.close());
+document.getElementById('perfilCta').addEventListener('click',()=>perfil.close());
+perfil.addEventListener('click',e=>{ if(e.target === perfil) perfil.close(); });
+
+/* ── Tema: preferência salva vence; o botão alterna ── */
 try{
   const saved = localStorage.getItem('demo-theme');
   if(saved) document.documentElement.dataset.theme = saved;
 }catch(e){}
 
-drawCards();
+document.querySelectorAll('.langsw a').forEach(a=>{
+  a.addEventListener('click',e=>{
+    e.preventDefault();
+    LANG = a.dataset.lang;
+    try{ localStorage.setItem('demo-lang',LANG); }catch(err){}
+    applyLang();
+  });
+});
+
+applyLang();
 
 document.getElementById('themeBtn').addEventListener('click',()=>{
   const next = dark() ? 'light' : 'dark';
@@ -470,6 +747,18 @@ document.getElementById('themeBtn').addEventListener('click',()=>{
   try{localStorage.setItem('demo-theme',next);}catch(e){}
   drawCards();
 });
+
+/* ── Sombra de la cabecera al hacer scroll ──────────────────── */
+(function(){
+  const head = document.querySelector('header.site');
+  let t = false;
+  function upd(){
+    head.classList.toggle('is-scrolled', scrollY > 8);
+    t = false;
+  }
+  addEventListener('scroll',()=>{ if(!t){ t = true; requestAnimationFrame(upd); } },{passive:true});
+  upd();
+})();
 
 /* ── Concierge (demo de flujo, sin backend) ── */
 const thread = document.getElementById('thread');
@@ -486,7 +775,7 @@ function add(text, kind){
 
 add('Hola, soy el concierge de EscortPorMadrid. ¿En qué puedo ayudarte?','bot');
 
-const HANDOFF = /(precio|tarifa|cu[aá]nto|reserv|cerrar|cita|descuento|barato)/i;
+const HANDOFF = /(precio|tarifa|cu[aá]nto|reserv|cerrar|cita|descuento|barato|price|rate|book|prix|tarif|réserver)/i;
 
 form.addEventListener('submit', e=>{
   e.preventDefault();
@@ -499,7 +788,7 @@ form.addEventListener('submit', e=>{
     if(HANDOFF.test(text)){
       add('Claro. El operador que lleva la agenda de Amaya te responde en unos minutos con la tarifa exacta y la disponibilidad de hoy.','bot');
       add('Conversación derivada al equipo · resumen y respuesta sugerida enviados al Telegram interno','sys');
-    } else if(/hola|buenas|hey/i.test(text)){
+    } else if(/hola|buenas|hey|hello|bonjour/i.test(text)){
       add('Hola. ¿Buscas compañía para una cena, un evento o un encuentro? Te propongo perfiles según lo que prefieras.','bot');
     } else if(/ingl[eé]s|english|franc[eé]s|français/i.test(text)){
       add('Tenemos perfiles que hablan inglés y francés. Dime qué zona de Madrid te viene mejor y te paso tres opciones.','bot');
