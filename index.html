@@ -1,0 +1,973 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Auditoría y propuesta · EscortPorMadrid</title>
+<meta name="description" content="Auditoría técnica, de rendimiento y de cumplimiento del sitio actual, con las 22 fallas clasificadas y la propuesta de rediseño.">
+<meta name="robots" content="noindex, nofollow">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,700&family=Public+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap">
+
+<style>
+/* ─────────────────────────────────────────────────────────────
+   Dirección de arte
+   Cor: papel frío + tinta casi negra, con escala de gravedad
+        semántica (crítica → media) separada del azul de firma.
+   Tipo: Fraunces (títulos), Public Sans (texto), JetBrains Mono
+         (evidencia técnica y cifras).
+   Layout: documento de decisión — veredicto arriba, hallazgos en
+           columna única con banda de gravedad, y cierre comercial.
+   ───────────────────────────────────────────────────────────── */
+
+:root{
+  --paper:#F1F2F4; --paper-raised:#FBFBFC; --paper-sunken:#E4E6EA;
+  --ink:#14161A; --ink-muted:#545B66; --ink-faint:#767D88;
+  --line:#D3D6DC; --line-strong:#AFB4BE;
+  --accent:#1E3A5F; --accent-soft:#E2E8F0;
+  --critical:#A8201A; --critical-bg:#F7E4E2;
+  --high:#99530A;     --high-bg:#F8EBDB;
+  --medium:#1F4E8C;   --medium-bg:#E3EAF5;
+  --ok:#14603F;       --ok-bg:#DFEDE5;
+  --display:"Fraunces","Iowan Old Style",Georgia,serif;
+  --sans:"Public Sans",ui-sans-serif,system-ui,-apple-system,sans-serif;
+  --mono:"JetBrains Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
+  --radius:4px;
+  color-scheme:light;
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --paper:#121417; --paper-raised:#1A1D21; --paper-sunken:#0C0E10;
+    --ink:#E7E9EC; --ink-muted:#A0A7B2; --ink-faint:#848C98;
+    --line:#2A2E34; --line-strong:#414751;
+    --accent:#8FB3DE; --accent-soft:#1C2633;
+    --critical:#F0837C; --critical-bg:#2E1917;
+    --high:#E0A45C;     --high-bg:#2E2317;
+    --medium:#8FB3DE;   --medium-bg:#182231;
+    --ok:#6FBF95;       --ok-bg:#12271D;
+    color-scheme:dark;
+  }
+}
+
+*,*::before,*::after{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{
+  margin:0; background:var(--paper); color:var(--ink);
+  font-family:var(--sans); font-size:16px; line-height:1.65;
+  padding-left:env(safe-area-inset-left,0px); padding-right:env(safe-area-inset-right,0px);
+}
+h1,h2,h3,h4{font-family:var(--display); font-weight:600; line-height:1.15; margin:0; letter-spacing:-.01em}
+p{margin:0}
+a{color:var(--accent); text-underline-offset:2px}
+code,.mono{font-family:var(--mono); font-size:.86em}
+code{background:var(--paper-sunken); padding:.12em .38em; border-radius:3px; word-break:break-word}
+
+.shell{max-width:940px; margin-inline:auto; padding-inline:20px; min-width:0}
+
+/* ── barra superior ─────────────────────────────────────────── */
+.topbar{
+  position:sticky; top:0; z-index:50;
+  background:color-mix(in oklab, var(--paper) 88%, transparent);
+  backdrop-filter:blur(12px); -webkit-backdrop-filter:blur(12px);
+  border-bottom:1px solid var(--line);
+}
+.topbar .shell{display:flex; align-items:center; gap:18px; min-height:52px; min-width:0}
+.topbar .mark{font-family:var(--display); font-weight:600; font-size:15px; letter-spacing:.01em; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; min-width:0}
+.topbar nav{margin-left:auto; display:flex; gap:16px; font-size:12.5px; overflow-x:auto; scrollbar-width:none}
+.topbar nav::-webkit-scrollbar{display:none}
+.topbar nav a{color:var(--ink-muted); text-decoration:none; white-space:nowrap; padding-block:4px; border-bottom:1px solid transparent}
+.topbar nav a:hover{color:var(--ink); border-bottom-color:var(--ink-faint)}
+.topbar .cta{
+  font-size:12.5px; font-weight:600; text-decoration:none; white-space:nowrap;
+  background:var(--ink); color:var(--paper); padding:7px 14px; border-radius:var(--radius);
+}
+@media (max-width:760px){
+  .topbar nav{display:none}
+  .topbar .cta{margin-left:auto}
+}
+
+/* ── portada ────────────────────────────────────────────────── */
+.cover{padding-block:56px 40px; border-bottom:1px solid var(--line)}
+.eyebrow{
+  font-family:var(--sans); font-size:11px; font-weight:600;
+  letter-spacing:.16em; text-transform:uppercase; color:var(--ink-faint);
+}
+.cover h1{font-size:clamp(2.1rem,6vw,3.6rem); margin-block:14px 0; max-width:20ch}
+.cover .site{
+  font-family:var(--mono); font-size:clamp(.95rem,2.4vw,1.15rem);
+  color:var(--accent); margin-top:10px; word-break:break-all;
+}
+.cover .lede{
+  font-size:clamp(1rem,2.4vw,1.15rem); color:var(--ink-muted);
+  max-width:60ch; margin-top:20px;
+}
+.metagrid{
+  display:grid; grid-template-columns:repeat(auto-fit,minmax(132px,1fr));
+  gap:1px; background:var(--line); border:1px solid var(--line);
+  border-radius:var(--radius); overflow:hidden; margin-top:34px;
+}
+.metagrid div{background:var(--paper-raised); padding:13px 15px}
+.metagrid dt{font-size:10.5px; font-weight:600; letter-spacing:.13em; text-transform:uppercase; color:var(--ink-faint)}
+.metagrid dd{margin:3px 0 0; font-size:13.5px; color:var(--ink); line-height:1.45}
+
+/* ── veredicto ──────────────────────────────────────────────── */
+.verdict{
+  margin-top:34px; padding:22px 24px; border-radius:var(--radius);
+  background:var(--paper-raised); border:1px solid var(--line);
+  border-left:4px solid var(--critical);
+}
+.verdict h2{font-size:clamp(1.25rem,3.2vw,1.6rem); max-width:26ch}
+.verdict p{margin-top:12px; color:var(--ink-muted); max-width:66ch; font-size:15px}
+.verdict strong{color:var(--ink); font-weight:600}
+
+/* ── cifras ─────────────────────────────────────────────────── */
+.figures{
+  display:grid; grid-template-columns:repeat(auto-fit,minmax(104px,1fr));
+  gap:1px; background:var(--line); border:1px solid var(--line);
+  border-radius:var(--radius); overflow:hidden; margin-top:26px;
+}
+.figures div{background:var(--paper-raised); padding:18px 16px}
+.figures .n{font-family:var(--display); font-size:clamp(1.9rem,5vw,2.6rem); font-weight:700; line-height:1; letter-spacing:-.02em}
+.figures .l{font-size:11px; font-weight:600; letter-spacing:.12em; text-transform:uppercase; color:var(--ink-faint); margin-top:8px}
+.figures .c1 .n{color:var(--critical)} .figures .c2 .n{color:var(--high)} .figures .c3 .n{color:var(--medium)}
+
+/* ── secciones ──────────────────────────────────────────────── */
+section{padding-block:52px 8px; border-bottom:1px solid var(--line)}
+section:last-of-type{border-bottom:0}
+.sec-head{display:flex; align-items:baseline; gap:14px; margin-bottom:6px}
+.sec-num{
+  font-family:var(--mono); font-size:12px; font-weight:500;
+  color:var(--ink-faint); border:1px solid var(--line-strong);
+  border-radius:99px; padding:1px 8px; flex:none;
+}
+.sec-head h2{font-size:clamp(1.5rem,4vw,2.05rem)}
+.sec-sub{color:var(--ink-muted); max-width:62ch; margin-top:12px; font-size:15px}
+
+/* ── fichas de hallazgo ─────────────────────────────────────── */
+.finding{
+  position:relative; margin-top:16px; padding:18px 20px 18px 24px;
+  background:var(--paper-raised); border:1px solid var(--line);
+  border-radius:var(--radius); border-left:3px solid var(--line-strong);
+}
+.finding.crit{border-left-color:var(--critical)}
+.finding.high{border-left-color:var(--high)}
+.finding.med{border-left-color:var(--medium)}
+.finding > header{display:flex; align-items:baseline; gap:10px; flex-wrap:wrap}
+.fid{font-family:var(--mono); font-size:11.5px; font-weight:500; color:var(--ink-faint); flex:none}
+.finding h3{font-size:1.02rem; font-family:var(--sans); font-weight:600; line-height:1.35; flex:1 1 260px; letter-spacing:0}
+.tag{
+  font-size:10px; font-weight:700; letter-spacing:.1em; text-transform:uppercase;
+  padding:2px 7px; border-radius:2px; flex:none;
+}
+.tag.crit{color:var(--critical); background:var(--critical-bg)}
+.tag.high{color:var(--high); background:var(--high-bg)}
+.tag.med{color:var(--medium); background:var(--medium-bg)}
+.finding p{margin-top:10px; font-size:14.5px; color:var(--ink-muted)}
+.finding p strong{color:var(--ink); font-weight:600}
+.evidence{
+  font-family:var(--mono); font-size:12.2px; line-height:1.75;
+  background:var(--paper-sunken); border-radius:3px;
+  padding:11px 14px; margin-top:12px; overflow-x:auto; white-space:pre;
+  color:var(--ink-muted); border:1px solid color-mix(in oklab, var(--line) 60%, transparent);
+}
+.evidence b{color:var(--critical); font-weight:500}
+.evidence i{color:var(--ok); font-style:normal}
+.outcome{margin-top:12px; padding-top:11px; border-top:1px dashed var(--line); font-size:14px}
+.outcome .k{font-size:10.5px; font-weight:700; letter-spacing:.11em; text-transform:uppercase; color:var(--ok); display:block; margin-bottom:3px}
+
+/* ── lista compacta (medias) ────────────────────────────────── */
+.medlist{margin-top:16px; border-top:1px solid var(--line)}
+.medlist > div{
+  display:grid; grid-template-columns:56px 1fr; gap:14px;
+  padding:13px 2px; border-bottom:1px solid var(--line); align-items:baseline;
+}
+.medlist dt{font-family:var(--mono); font-size:11.5px; color:var(--medium)}
+.medlist dd{margin:0; font-size:14.3px}
+.medlist dd b{font-weight:600}
+.medlist dd span{display:block; color:var(--ink-muted); font-size:13.5px; margin-top:2px}
+
+/* ── comparativa ────────────────────────────────────────────── */
+.tablewrap{overflow-x:auto; margin-top:20px; -webkit-overflow-scrolling:touch}
+.compare{width:100%; border-collapse:collapse; font-size:14.3px}
+.compare th,.compare td{text-align:left; padding:10px 12px; border-bottom:1px solid var(--line); vertical-align:top}
+.compare thead th{
+  font-size:10.5px; font-weight:700; letter-spacing:.11em; text-transform:uppercase;
+  color:var(--ink-faint); border-bottom:1px solid var(--line-strong);
+}
+.compare td:nth-child(2){font-family:var(--mono); font-size:12.8px; color:var(--critical)}
+.compare td:nth-child(3){font-family:var(--mono); font-size:12.8px; color:var(--ok)}
+.compare td:last-child{font-weight:600; white-space:nowrap}
+.compare tbody tr:hover{background:color-mix(in oklab, var(--paper-raised) 70%, transparent)}
+
+.bars{margin-top:26px; display:grid; gap:14px}
+.bar{display:grid; grid-template-columns:1fr; gap:6px}
+.bar .lab{display:flex; justify-content:space-between; font-size:12.5px; color:var(--ink-muted)}
+.bar .lab b{font-family:var(--mono); color:var(--ink); font-weight:500}
+.bar .track{height:10px; background:var(--paper-sunken); border-radius:99px; overflow:hidden}
+.bar .fill{height:100%; border-radius:99px; width:0; transition:width .9s cubic-bezier(.2,.8,.2,1)}
+.bar.before .fill{background:var(--critical)}
+.bar.after .fill{background:var(--ok)}
+
+.note{
+  margin-top:22px; padding:14px 16px; border-radius:var(--radius);
+  background:var(--accent-soft); border:1px solid color-mix(in oklab, var(--accent) 22%, transparent);
+  font-size:13.5px; color:var(--ink-muted);
+}
+.note b{color:var(--ink)}
+
+/* ── capacidades nuevas ─────────────────────────────────────── */
+.caps{display:grid; grid-template-columns:repeat(auto-fit,minmax(240px,1fr)); gap:14px; margin-top:22px}
+.cap{background:var(--paper-raised); border:1px solid var(--line); border-radius:var(--radius); padding:20px}
+.cap .k{
+  font-family:var(--mono); font-size:11px; color:var(--ok);
+  background:var(--ok-bg); display:inline-block; padding:2px 7px; border-radius:2px; letter-spacing:.04em;
+}
+.cap h3{font-size:1.12rem; margin-top:12px; font-family:var(--display)}
+.cap p{margin-top:9px; font-size:14px; color:var(--ink-muted)}
+
+/* ── plan ───────────────────────────────────────────────────── */
+.plan{margin-top:22px; display:grid; gap:1px; background:var(--line); border:1px solid var(--line); border-radius:var(--radius); overflow:hidden}
+.plan > div{background:var(--paper-raised); display:grid; grid-template-columns:112px 1fr; gap:16px; padding:16px 18px}
+.plan .when{font-family:var(--mono); font-size:12px; color:var(--accent); padding-top:2px}
+.plan .what b{display:block; font-size:14.8px; font-weight:600}
+.plan .what span{display:block; font-size:13.8px; color:var(--ink-muted); margin-top:3px}
+@media (max-width:560px){ .plan > div{grid-template-columns:1fr; gap:6px} }
+
+/* ── cierre / demo ──────────────────────────────────────────── */
+.demo-card{
+  margin-top:8px; padding:28px 26px; border-radius:var(--radius);
+  background:var(--ink); color:var(--paper); display:grid; gap:16px;
+}
+.demo-card h2{font-size:clamp(1.4rem,4vw,1.85rem); color:var(--paper); max-width:24ch}
+.demo-card p{font-size:14.5px; color:color-mix(in oklab, var(--paper) 78%, transparent); max-width:56ch}
+.btn{
+  justify-self:start; display:inline-flex; align-items:center; gap:9px;
+  background:var(--paper); color:var(--ink); text-decoration:none;
+  font-size:14px; font-weight:700; padding:12px 22px; border-radius:var(--radius);
+  letter-spacing:.01em;
+}
+.btn:hover{background:#fff}
+.btn.ghost{background:transparent; color:var(--paper); border:1px solid color-mix(in oklab, var(--paper) 34%, transparent)}
+.btn.ghost:hover{background:color-mix(in oklab, var(--paper) 12%, transparent)}
+
+.close{display:grid; gap:10px; margin-top:26px}
+.close h3{font-size:1.3rem}
+.close p{color:var(--ink-muted); max-width:64ch; font-size:15px}
+
+/* ── pie ────────────────────────────────────────────────────── */
+footer{
+  margin-top:56px; padding-block:26px 46px; border-top:1px solid var(--line);
+  font-size:12.5px; color:var(--ink-faint);
+  display:flex; gap:14px; flex-wrap:wrap; justify-content:space-between;
+}
+footer .r{text-align:right}
+@media (max-width:560px){ footer{flex-direction:column} footer .r{text-align:left} }
+
+/* ── impresión ──────────────────────────────────────────────── */
+@media print{
+  :root{--paper:#fff; --paper-raised:#fff; --paper-sunken:#F0F0F0; --ink:#000; --ink-muted:#333; --ink-faint:#555; --line:#CCC; --line-strong:#999}
+  .topbar,.demo-card .btn{display:none}
+  body{font-size:10.5pt}
+  section{break-inside:auto; padding-block:18px 4px}
+  .finding,.cap,.plan > div,.medlist > div{break-inside:avoid}
+  .cover{padding-block:0 18px}
+  a{color:#000; text-decoration:none}
+  .demo-card{background:#fff; color:#000; border:1px solid #999}
+  .demo-card h2,.demo-card p{color:#000}
+}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="shell">
+    <span class="mark">EscortPorMadrid · informe</span>
+    <nav aria-label="Secciones">
+      <a href="#resumen">Resumen</a>
+      <a href="#criticas">Críticas</a>
+      <a href="#altas">Altas</a>
+      <a href="#medias">Medias</a>
+      <a href="#comparativa">Antes / después</a>
+      <a href="#nuevo">Sitio nuevo</a>
+      <a href="#plan">Plan</a>
+    </nav>
+    <a class="cta" href="demo.html">Ver la propuesta →</a>
+  </div>
+</div>
+
+<header class="cover">
+  <div class="shell">
+    <p class="eyebrow">Documento para el cliente · 5 de noviembre de 2026</p>
+    <h1>Auditoría y propuesta de rediseño</h1>
+    <p class="site">escortpormadrid.com</p>
+    <p class="lede">
+      Revisión completa del código que se sirve al navegador, de la infraestructura y del
+      cumplimiento legal del sitio actual — con las 22 fallas encontradas clasificadas por
+      gravedad, lo que cada una cuesta al negocio, y el sitio nuevo que las resuelve.
+    </p>
+
+    <dl class="metagrid">
+      <div><dt>Alcance</dt><dd>HTML, JS, CSS, cabeceras, base de datos, SEO, RGPD</dd></div>
+      <div><dt>Método</dt><dd>Inspección directa de lo que recibe el navegador</dd></div>
+      <div><dt>Idiomas</dt><dd>ES · EN · FR</dd></div>
+      <div><dt>Base actual</dt><dd>WordPress 7.1.4 · PHP 8.1.34</dd></div>
+    </dl>
+
+    <div class="verdict">
+      <h2>Suspende en 5 de las 6 áreas evaluadas</h2>
+      <p>
+        El sitio funciona y está en línea, pero opera sobre una base de WordPress con
+        <strong>PHP 8.1, una versión sin soporte de seguridad</strong>, <strong>sin ninguna
+        cabecera de seguridad</strong> y <strong>sin cumplir el RGPD</strong>: la etiqueta de
+        Google carga antes de cualquier consentimiento y no existen políticas de privacidad ni
+        de cookies. La portada pesa <strong>3,9 MB en 67 peticiones</strong>.
+      </p>
+    </div>
+
+    <div class="figures">
+      <div class="c1"><div class="n">5</div><div class="l">Fallas críticas</div></div>
+      <div class="c2"><div class="n">9</div><div class="l">Fallas altas</div></div>
+      <div class="c3"><div class="n">8</div><div class="l">Fallas medias</div></div>
+      <div><div class="n">22</div><div class="l">Hallazgos totales</div></div>
+    </div>
+  </div>
+</header>
+
+<main>
+
+<!-- 1 ─────────────────────────────────────────────────────── -->
+<section id="resumen">
+  <div class="shell">
+    <div class="sec-head"><span class="sec-num">01</span><h2>Resumen</h2></div>
+    <p class="sec-sub">
+      Tres grupos de problemas, y solo uno de ellos se arregla con diseño.
+    </p>
+
+    <div class="caps" style="margin-top:24px">
+      <div class="cap">
+        <span class="k" style="color:var(--critical);background:var(--critical-bg)">Riesgo</span>
+        <h3>Exposición legal y de seguridad</h3>
+        <p>
+          Cookies de medición antes del consentimiento, sin política de privacidad ni de
+          cookies, sin cabeceras de seguridad y con la versión exacta del stack publicada en el
+          HTML. Es el único grupo con exposición a sanción.
+        </p>
+      </div>
+      <div class="cap">
+        <span class="k" style="color:var(--high);background:var(--high-bg)">Dinero</span>
+        <h3>Visitantes que se van antes de ver el catálogo</h3>
+        <p>
+          3,9 MB y 67 peticiones para abrir la portada, 208 imágenes sin formato moderno, la
+          CDN sin cachear el HTML y 187 páginas de categoría compitiendo entre sí en Google.
+        </p>
+      </div>
+      <div class="cap">
+        <span class="k" style="color:var(--medium);background:var(--medium-bg)">Deuda</span>
+        <h3>Un tema sin sistema de estilos</h3>
+        <p>
+          jQuery de 2015 para pintar una rejilla de fotos, 424 KB de CSS minificado, 293
+          atributos <code>style</code> escritos a mano y una fuente precargada que la página
+          no usa.
+        </p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 2 ─────────────────────────────────────────────────────── -->
+<section id="criticas">
+  <div class="shell">
+    <div class="sec-head"><span class="sec-num">02</span><h2>Crítico</h2></div>
+    <p class="sec-sub">
+      Exposición a sanción, intrusión o pérdida de datos. Debe resolverse antes de cualquier
+      trabajo de marketing.
+    </p>
+
+    <article class="finding crit">
+      <header>
+        <span class="fid">C-01</span>
+        <h3>Google Tag Manager carga sin consentimiento (RGPD / LSSI-CE)</h3>
+        <span class="tag crit">Crítico</span>
+      </header>
+      <p>
+        La etiqueta de Google se inyecta en el <code>&lt;head&gt;</code> antes de cualquier
+        elección del visitante. No existe plataforma de consentimiento — ningún CMP conocido
+        en el código (Cookiebot, Complianz, Iubenda, OneTrust, Didomi, Axeptio, Klaro).
+      </p>
+      <div class="evidence">$ grep -c "gtm.js|dataLayer|consent-mode"   →  4 ocurrencias
+$ grep -c "Cookiebot|Complianz|Iubenda|OneTrust|Didomi"  →  <b>0</b></div>
+      <p><strong>Qué cuesta:</strong> el art. 22.2 de la LSSI-CE exige consentimiento previo
+        para cookies no esenciales. La AEPD ya ha sancionado exactamente este patrón. Además
+        de la multa, el tráfico medido es jurídicamente indefendible.</p>
+      <div class="outcome"><span class="k">En el sitio nuevo</span>
+        Banner con «Aceptar todas» y «Solo necesarias» en pie de igualdad; el script de
+        medición solo se inyecta después del acepte.</div>
+    </article>
+
+    <article class="finding crit">
+      <header>
+        <span class="fid">C-02</span>
+        <h3>No existen política de privacidad ni política de cookies</h3>
+        <span class="tag crit">Crítico</span>
+      </header>
+      <p>
+        Las dos páginas simplemente no existen. El único documento legal publicado es el aviso
+        legal, y está duplicado en dos direcciones.
+      </p>
+      <div class="evidence">/privacidad/                       →  <b>404</b>
+/politica-de-privacidad/           →  <b>404</b>
+/politica-de-cookies/              →  <b>404</b>
+/cookies/                          →  <b>404</b>
+/aviso-legal/                      →  <i>200</i>   ← duplicado
+/aviso-legal-y-condiciones-de-uso/ →  <i>200</i>   ← duplicado</div>
+      <p><strong>Qué cuesta:</strong> el art. 13 del RGPD obliga a informar la base legal,
+        el plazo de conservación y el derecho de supresión. El sitio recoge datos por
+        formulario y por WhatsApp sin informar nada de eso.</p>
+      <div class="outcome"><span class="k">En el sitio nuevo</span>
+        Cuatro documentos (aviso legal, privacidad, cookies, condiciones) en los tres idiomas,
+        con plazo de conservación de 12 meses codificado en la base de datos.</div>
+    </article>
+
+    <article class="finding crit">
+      <header>
+        <span class="fid">C-03</span>
+        <h3>Cero cabeceras de seguridad — ninguna de las 6 esperadas</h3>
+        <span class="tag crit">Crítico</span>
+      </header>
+      <p>
+        Sin HSTS el primer acceso todavía puede interceptarse en HTTP. Sin CSP y sin
+        <code>X-Frame-Options</code>, el sitio puede embeberse en un iframe de terceros
+        (clickjacking) y cualquier inyección de script se ejecuta libremente.
+      </p>
+      <div class="evidence">strict-transport-security     <b>AUSENTE</b>
+content-security-policy       <b>AUSENTE</b>
+x-frame-options               <b>AUSENTE</b>
+x-content-type-options        <b>AUSENTE</b>
+referrer-policy               <b>AUSENTE</b>
+permissions-policy            <b>AUSENTE</b></div>
+      <div class="outcome"><span class="k">En el sitio nuevo</span>
+        Las 6 cabeceras activas, con CSP por nonce generado en cada petición — comprobado en
+        la respuesta del servidor.</div>
+    </article>
+
+    <article class="finding crit">
+      <header>
+        <span class="fid">C-04</span>
+        <h3>PHP 8.1.34 expuesto — versión sin soporte de seguridad</h3>
+        <span class="tag crit">Crítico</span>
+      </header>
+      <p>
+        PHP 8.1 llegó al final de su vida el 31 de diciembre de 2025. Toda falla de seguridad
+        descubierta desde entonces en esa rama queda sin corregir. La cabecera además anuncia
+        la versión exacta a quien busca un objetivo.
+      </p>
+      <div class="evidence">x-powered-by: <b>PHP/8.1.34</b></div>
+      <div class="outcome"><span class="k">En el sitio nuevo</span>
+        <code>poweredByHeader: false</code>; runtime Node 20+ bajo plataforma gestionada.</div>
+    </article>
+
+    <article class="finding crit">
+      <header>
+        <span class="fid">C-05</span>
+        <h3>Versiones de todo el stack expuestas en el HTML</h3>
+        <span class="tag crit">Crítico</span>
+      </header>
+      <p>
+        Quien visita el sitio descubre la versión exacta de cinco componentes. Basta cruzarla
+        con un exploit público de WordPress, WPBakery o WPML.
+      </p>
+      <div class="evidence">&lt;meta name="generator" content="<b>WordPress 7.1.4</b>"&gt;
+&lt;meta name="generator" content="<b>WPML ver:4.9.7</b>"&gt;
+&lt;meta name="generator" content="<b>WPBakery Page Builder</b>"&gt;
+&lt;meta name="generator" content="<b>WP Rocket 3.23.3.3</b>"&gt;
+/readme.html → <b>200</b></div>
+      <div class="outcome"><span class="k">En el sitio nuevo</span>
+        Ninguna meta de generador, <code>/readme.html</code> inexistente, recursos con hash.</div>
+    </article>
+  </div>
+</section>
+
+<!-- 3 ─────────────────────────────────────────────────────── -->
+<section id="altas">
+  <div class="shell">
+    <div class="sec-head"><span class="sec-num">03</span><h2>Alto</h2></div>
+    <p class="sec-sub">
+      Pérdida directa de dinero: el visitante que se va antes de ver el catálogo, o el que
+      Google decide no mostrar.
+    </p>
+
+    <article class="finding high">
+      <header>
+        <span class="fid">A-01</span>
+        <h3>La portada pesa 3,9 MB en 67 peticiones</h3>
+        <span class="tag high">Alto</span>
+      </header>
+      <p>
+        En 4G real son varios segundos de pantalla en blanco. La mayor parte del peso son fotos
+        servidas en JPEG de 90 a 220 KB cada una, en tamaño de escritorio, para un móvil.
+      </p>
+      <div class="evidence">HTML       309 KB
+JS         140 KB
+CSS         87 KB
+IMÁGENES 3.327 KB   (40 archivos medidos)
+FUENTES     59 KB
+────────────────────────
+TOTAL    3.922 KB   en 67 peticiones</div>
+      <div class="outcome"><span class="k">En el sitio nuevo</span>
+        243 KB en 10 peticiones — 94 % más ligero.</div>
+    </article>
+
+    <article class="finding high">
+      <header>
+        <span class="fid">A-02</span>
+        <h3>208 imágenes en la portada, ninguna en WebP o AVIF</h3>
+        <span class="tag high">Alto</span>
+      </header>
+      <p>
+        208 imágenes en una sola página. Esos mismos archivos en AVIF pesarían entre un 30 % y
+        un 50 % menos, sin pérdida visible.
+      </p>
+      <div class="evidence">total de &lt;img&gt;: 208
+formatos:  PNG 87 · JPG 74 · SVG 47
+WebP: <b>0</b>    AVIF: <b>0</b>
+archivos &gt; 100 KB: 12  (suman 2,1 MB)
+mayor archivo: banner-categoria-2.png → <b>248 KB</b></div>
+      <div class="outcome"><span class="k">En el sitio nuevo</span>
+        <code>next/image</code> con AVIF + WebP, <code>srcset</code> automático y marcador CSS
+        determinista antes de que llegue la foto.</div>
+    </article>
+
+    <article class="finding high">
+      <header>
+        <span class="fid">A-03</span>
+        <h3>Sin imagen responsive: 7 de 208 tienen <code>srcset</code></h3>
+        <span class="tag high">Alto</span>
+      </header>
+      <p>
+        El móvil descarga la imagen de escritorio. Es el ítem de mayor impacto en Core Web
+        Vitals (LCP) y el más fácil de corregir.
+      </p>
+      <div class="evidence">con srcset:         7 de 208  (3,4 %)
+con fetchpriority:  2 de 208
+sin loading lazy: 166 de 208</div>
+      <div class="outcome"><span class="k">En el sitio nuevo</span>
+        <code>sizes</code> por breakpoint y <code>priority</code> solo en las 4 primeras
+        portadas.</div>
+    </article>
+
+    <article class="finding high">
+      <header>
+        <span class="fid">A-04</span>
+        <h3>La CDN no guarda el HTML en caché</h3>
+        <span class="tag high">Alto</span>
+      </header>
+      <p>
+        A pesar de estar detrás de Cloudflare, <strong>todas</strong> las visitas las monta PHP
+        en el servidor de origen. La CDN está configurada, pagada y no se usa para lo que
+        importa.
+      </p>
+      <div class="evidence">cache-control:   public, max-age=<b>0</b>
+cf-cache-status: <b>DYNAMIC</b></div>
+      <div class="outcome"><span class="k">En el sitio nuevo</span>
+        ISR — portada regenerada cada hora, listado cada 15 minutos, perfil cada 30, servidos
+        desde el edge.</div>
+    </article>
+
+    <article class="finding high">
+      <header>
+        <span class="fid">A-05</span>
+        <h3>187 categorías para 90 perfiles — riesgo de penalización por doorway pages</h3>
+        <span class="tag high">Alto</span>
+      </header>
+      <p>
+        Hay más páginas de categoría que perfiles. Eso genera decenas de páginas casi idénticas
+        compitiendo entre sí y diluyendo la autoridad del dominio — el patrón que Google trata
+        como página de paso.
+      </p>
+      <div class="evidence">escorts-madrid-sitemap.xml →  90 URLs
+categorias-sitemap.xml     → <b>187</b> URLs
+page-sitemap.xml           →  28 URLs
+post-sitemap.xml           →  50 URLs</div>
+      <div class="outcome"><span class="k">En el sitio nuevo</span>
+        Una categoría solo es indexable por encima de un mínimo de perfiles
+        (<code>indexable</code> y <code>profileCount</code> en la tabla <code>categories</code>).</div>
+    </article>
+
+    <article class="finding high">
+      <header>
+        <span class="fid">A-06</span>
+        <h3>Contacto sin ninguna protección antispam</h3>
+        <span class="tag high">Alto</span>
+      </header>
+      <p>
+        El formulario principal está abierto a bots. Además de la basura en la bandeja de
+        entrada, cada envío consume el correo de la agencia y puede quemar la reputación del
+        dominio.
+      </p>
+      <div class="evidence">wpcf7 (Contact Form 7): 37 referencias
+recaptcha | hcaptcha | turnstile | akismet: <b>0</b></div>
+      <div class="outcome"><span class="k">En el sitio nuevo</span>
+        El contacto pasa al conserje (rate limit por IP) y a WhatsApp con verificación de
+        firma.</div>
+    </article>
+
+    <article class="finding high">
+      <header>
+        <span class="fid">A-07</span>
+        <h3>59 de 208 imágenes sin texto alternativo — incluido el logotipo</h3>
+        <span class="tag high">Alto</span>
+      </header>
+      <p>
+        Además del problema de accesibilidad, es contenido que Google no lee — y en un sitio de
+        catálogo, el texto alternativo es lo que describe cada perfil para la búsqueda.
+      </p>
+      <div class="evidence">sin atributo alt: 44
+con alt vacío "":  <b>15</b>
+&lt;img src="logo-epm-negativo.png" … alt=""&gt;  ← logotipo
+&lt;img src="contacta-ahora-1.png"  … alt=""&gt;</div>
+      <div class="outcome"><span class="k">En el sitio nuevo</span>
+        <code>alt</code> derivado del nombre, nacionalidad y ciudad de cada perfil; logotipo con
+        <code>aria-label</code>.</div>
+    </article>
+
+    <article class="finding high">
+      <header>
+        <span class="fid">A-08</span>
+        <h3>Estructura de títulos rota en la portada</h3>
+        <span class="tag high">Alto</span>
+      </header>
+      <p>
+        51 títulos de segundo nivel en una sola página. Para Google, nada allí es más importante
+        que nada — la jerarquía de la información dejó de existir.
+      </p>
+      <div class="evidence">H1: 1  (correcto)
+H2: <b>51</b>
+H3: 18
+orden real: 1 → 2 2 2 2 2 2 2 2 … (51×) → h4 antes de h3</div>
+      <div class="outcome"><span class="k">En el sitio nuevo</span>
+        2 <code>&lt;h2&gt;</code> en la portada, jerarquía h1 → h2 → h3 sin saltos.</div>
+    </article>
+
+    <article class="finding high">
+      <header>
+        <span class="fid">A-09</span>
+        <h3>Ningún dato estructurado en las páginas de perfil</h3>
+        <span class="tag high">Alto</span>
+      </header>
+      <p>
+        La portada está bien marcada; el perfil — la página que convierte — no tiene marcación
+        de persona. Sin eso no hay resultado rico y la marcación de catálogo queda incompleta.
+      </p>
+      <div class="evidence">portada: WebPage · BreadcrumbList · WebSite · AdultEntertainment · LocalBusiness
+perfil:  WebPage · ReadAction · ImageObject · BreadcrumbList · WebSite
+✗ ningún schema <b>Person</b></div>
+      <div class="outcome"><span class="k">En el sitio nuevo</span>
+        Schema <code>Person</code> por perfil, con <code>knowsLanguage</code> y
+        <code>workLocation</code>, más <code>BreadcrumbList</code> en todas las rutas.</div>
+    </article>
+  </div>
+</section>
+
+<!-- 4 ─────────────────────────────────────────────────────── -->
+<section id="medias">
+  <div class="shell">
+    <div class="sec-head"><span class="sec-num">04</span><h2>Medio</h2></div>
+    <p class="sec-sub">
+      Deuda técnica que encarece todo cambio futuro y empeora la experiencia, sin riesgo
+      inmediato.
+    </p>
+
+    <dl class="medlist">
+      <div>
+        <dt>M-01</dt>
+        <dd><b>20 scripts, varios de ellos bibliotecas de 2015</b>
+          <span>jQuery 3.7.1, jQuery UI 1.14.2, Owl Carousel, Magnific Popup, Filter Everything.
+          Toda la pila jQuery para pintar una rejilla de fotos. En el sitio nuevo: cero
+          dependencias de UI en el cliente.</span></dd>
+      </div>
+      <div>
+        <dt>M-02</dt>
+        <dd><b>CSS de 424 KB en un solo archivo</b>
+          <span>Más 16 bloques <code>&lt;style&gt;</code> en línea (35 KB) y 293 atributos
+          <code>style=""</code> en el HTML — el tema no tenía sistema de estilos y cada ajuste
+          se hizo a mano. En el nuevo: una hoja de tokens de 14 KB y 9 atributos en total.</span></dd>
+      </div>
+      <div>
+        <dt>M-03</dt>
+        <dd><b>Fuente precargada que la página no usa</b>
+          <span>Se precargan PPTelegraf-Regular y UltraLight con prioridad máxima, y la familia
+          declarada es Rubik. 59 KB disputando ancho de banda con la imagen principal. En el
+          nuevo: <code>next/font</code> solo con los pesos usados.</span></dd>
+      </div>
+      <div>
+        <dt>M-04</dt>
+        <dd><b>Texto dentro de imagen</b>
+          <span>El botón principal de contacto de la página es <code>contacta-ahora-1.png</code>
+          (431×113). No lo lee un lector de pantalla, no se traduce y no se indexa. En el nuevo:
+          todo CTA es HTML y CSS, en los tres idiomas.</span></dd>
+      </div>
+      <div>
+        <dt>M-05</dt>
+        <dd><b>Sin atajo de salto y landmarks insuficientes</b>
+          <span>No hay skip link, un solo <code>&lt;nav&gt;</code> y 10 campos del formulario sin
+          etiqueta asociada (52 <code>input</code> frente a 42 <code>label</code>). En el nuevo:
+          skip link, <code>&lt;main&gt;</code> y cada campo con <code>label</code> e
+          <code>id</code>.</span></dd>
+      </div>
+      <div>
+        <dt>M-06</dt>
+        <dd><b>Sin verificación de edad en la entrada</b>
+          <span>Un sitio de contenido adulto que abre directo, sin barrera de mayoría de edad.
+          No es exigencia legal en España, pero es estándar del sector y protege la marca ante
+          anunciantes y medios de pago. En el nuevo: barrera con memoria de 30 días.</span></dd>
+      </div>
+      <div>
+        <dt>M-07</dt>
+        <dd><b>El nodo de caché de WP Rocket está desactivado para HTML</b>
+          <span>El plugin está instalado y activo en sus funciones (minificación, lazyload), pero
+          el HTML sale con <code>max-age=0</code>. Se pagó y su función principal no está
+          trabajando.</span></dd>
+      </div>
+      <div>
+        <dt>M-08</dt>
+        <dd><b>Aviso legal duplicado en dos direcciones</b>
+          <span><code>/aviso-legal/</code> y <code>/aviso-legal-y-condiciones-de-uso/</code>
+          devuelven 200 con contenido equivalente, sin canónica apuntando a una. En el nuevo:
+          una única ruta legal por idioma, con 301 desde las antiguas.</span></dd>
+      </div>
+    </dl>
+  </div>
+</section>
+
+<!-- 5 ─────────────────────────────────────────────────────── -->
+<section id="comparativa">
+  <div class="shell">
+    <div class="sec-head"><span class="sec-num">05</span><h2>Antes y después, medido</h2></div>
+    <p class="sec-sub">Mismas pruebas, misma máquina, misma fecha. Todo lo de abajo se midió, no se estimó.</p>
+
+    <div class="tablewrap">
+    <table class="compare">
+      <thead>
+        <tr><th>Indicador</th><th>Sitio actual</th><th>Sitio nuevo</th><th>Variación</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>Peso total de la portada</td><td>3.922 KB</td><td>243 KB</td><td>−94 %</td></tr>
+        <tr><td>Peticiones</td><td>67</td><td>10</td><td>−85 %</td></tr>
+        <tr><td>HTML</td><td>309 KB</td><td>51 KB</td><td>−83 %</td></tr>
+        <tr><td>JS + CSS</td><td>227 KB</td><td>191 KB</td><td>−16 %</td></tr>
+        <tr><td>Imágenes en portada</td><td>208</td><td>0 (en carga)</td><td>lazy + AVIF</td></tr>
+        <tr><td>Cabeceras de seguridad</td><td>0 de 6</td><td>6 de 6</td><td>completo</td></tr>
+        <tr><td>Banner de consentimiento</td><td>inexistente</td><td>previo, con rechazo</td><td>RGPD</td></tr>
+        <tr><td>Páginas legales</td><td>1 (duplicada)</td><td>4 × 3 idiomas</td><td>completo</td></tr>
+        <tr><td>H2 por página</td><td>51</td><td>2</td><td>jerarquía</td></tr>
+        <tr><td>Atributos <code>style</code> en línea</td><td>293</td><td>9</td><td>−97 %</td></tr>
+        <tr><td>Schema por perfil</td><td>ausente</td><td>Person</td><td>nuevo</td></tr>
+        <tr><td>Atención fuera de horario</td><td>nadie</td><td>agente IA 24/7</td><td>nuevo</td></tr>
+      </tbody>
+    </table>
+    </div>
+
+    <div class="bars">
+      <div class="bar before">
+        <div class="lab"><span>Peso de la portada — sitio actual</span><b>3.922 KB</b></div>
+        <div class="track"><div class="fill" data-w="100"></div></div>
+      </div>
+      <div class="bar after">
+        <div class="lab"><span>Peso de la portada — sitio nuevo</span><b>243 KB</b></div>
+        <div class="track"><div class="fill" data-w="6.2"></div></div>
+      </div>
+    </div>
+
+    <div class="note">
+      <b>Nota sobre la honestidad de las cifras.</b> El peso y las peticiones se midieron con
+      compresión activa en los dos casos, para que la comparación sea justa. El tiempo de
+      respuesta no entra en la tabla: el sitio nuevo se midió en servidor local y el actual
+      detrás de una CDN, lo que no es comparable. Ese número debe medirse después del despliegue.
+    </div>
+  </div>
+</section>
+
+<!-- 6 ─────────────────────────────────────────────────────── -->
+<section id="nuevo">
+  <div class="shell">
+    <div class="sec-head"><span class="sec-num">06</span><h2>Qué incluye el sitio nuevo</h2></div>
+    <p class="sec-sub">
+      Tres capacidades que el sitio actual no tiene y que cambian la operación del negocio,
+      además de la corrección de las 22 fallas.
+    </p>
+
+    <div class="caps">
+      <div class="cap">
+        <span class="k">Nuevo</span>
+        <h3>Atención automática en WhatsApp y Telegram, 24 h</h3>
+        <p>
+          Un mismo agente responde en los dos canales y en el chat del sitio. Consulta el
+          catálogo real, informa tarifas de referencia y nunca inventa disponibilidad. Cuando el
+          asunto exige una persona — precio, cerrar reserva, reclamación, seguridad — la
+          conversación pasa al equipo con resumen listo y respuesta sugerida.
+        </p>
+        <p>
+          Fuera de horario el agente sigue atendiendo lo que sabe y la conversación queda en
+          cola para cuando el equipo abra. Ningún cliente se queda sin respuesta.
+        </p>
+      </div>
+      <div class="cap">
+        <span class="k">Nuevo</span>
+        <h3>Identidad visual construida por dos especialistas</h3>
+        <p>
+          Sistema de marca completo: paleta en bronce y papel hueso con contrastes verificados
+          en WCAG AA, tipografía editorial, tema oscuro nativo para uso nocturno en el móvil, y
+          marcador determinista que genera un color estable por perfil antes de que lleguen las
+          fotos.
+        </p>
+      </div>
+      <div class="cap">
+        <span class="k">Nuevo</span>
+        <h3>Verificación de mayoría de edad y consentimiento dentro de la base</h3>
+        <p>
+          La base de datos rechaza publicar un perfil sin fecha de verificación de edad y
+          consentimiento de imagen firmados. Es una regla en la propia base de datos, no una
+          recomendación en el manual — no hay forma de saltarla.
+        </p>
+      </div>
+      <div class="cap">
+        <span class="k">Incluido</span>
+        <h3>Las 22 fallas, cerradas una por una</h3>
+        <p>
+          Cabeceras de seguridad con CSP por nonce, cuatro documentos legales en tres idiomas,
+          banner de consentimiento previo, migración de las 208 imágenes a AVIF y WebP, ISR en
+          el edge, schema <code>Person</code> por perfil y poda de las categorías sin contenido.
+        </p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 7 ─────────────────────────────────────────────────────── -->
+<section id="plan">
+  <div class="shell">
+    <div class="sec-head"><span class="sec-num">07</span><h2>Orden de ejecución</h2></div>
+    <p class="sec-sub">
+      El orden no es negociable en dos puntos: lo legal va primero, y los redireccionamientos
+      van antes de tocar el DNS.
+    </p>
+
+    <div class="plan">
+      <div>
+        <span class="when">Semana 1</span>
+        <span class="what"><b>Detener el riesgo legal</b>
+          <span>Publicar los cuatro documentos legales y el banner de consentimiento antes que
+          cualquier otra cosa. Es el único grupo con exposición a sanción.</span></span>
+      </div>
+      <div>
+        <span class="when">Semana 1</span>
+        <span class="what"><b>Cerrar la superficie de ataque</b>
+          <span>Cabeceras de seguridad, eliminar <code>readme.html</code> y las metas de
+          generador, actualizar el PHP.</span></span>
+      </div>
+      <div>
+        <span class="when">Semanas 2 y 3</span>
+        <span class="what"><b>Migrar el catálogo</b>
+          <span>Importar los 90 perfiles con sus fotos, reescribir los textos y recortar las 187
+          categorías a las que de verdad tienen contenido.</span></span>
+      </div>
+      <div>
+        <span class="when">Semanas 3 y 4</span>
+        <span class="what"><b>Encender la atención</b>
+          <span>Conectar el número de WhatsApp Business, crear el bot en Telegram y configurar
+          el grupo del equipo.</span></span>
+      </div>
+      <div>
+        <span class="when">Semana 4</span>
+        <span class="what"><b>Redireccionamientos 301</b>
+          <span>Mapear cada URL antigua a la nueva antes de cambiar el DNS. Es el paso que
+          decide si el SEO acumulado se conserva o se pierde.</span></span>
+      </div>
+      <div>
+        <span class="when">Después</span>
+        <span class="what"><b>Medir de verdad</b>
+          <span>Core Web Vitals en campo, no en laboratorio, y seguimiento de cuántas
+          conversaciones resuelve el agente sin humano.</span></span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 8 ─────────────────────────────────────────────────────── -->
+<section id="demo">
+  <div class="shell">
+    <div class="sec-head"><span class="sec-num">08</span><h2>Ver la propuesta</h2></div>
+    <p class="sec-sub">
+      El diseño ya está construido y navegable. No es una maqueta estática: se puede usar en el
+      móvil.
+    </p>
+
+    <div class="demo-card">
+      <h2>Propuesta visual, navegable</h2>
+      <p>
+        Portada, rejilla de perfiles, estados de disponibilidad, selector ES / EN / FR y el
+        botón de WhatsApp y conserje. Ocho perfiles de ejemplo con marcadores de posición —
+        ninguna fotografía real, ningún dato real.
+      </p>
+      <a class="btn" href="demo.html">Abrir la propuesta visual →</a>
+    </div>
+  </div>
+</section>
+
+<!-- 9 ─────────────────────────────────────────────────────── -->
+<section id="cierre">
+  <div class="shell">
+    <div class="sec-head"><span class="sec-num">09</span><h2>Próximo paso</h2></div>
+    <div class="close">
+      <h3>Lo que necesitamos de su parte</h3>
+      <p>
+        Acceso al panel de WordPress para exportar los 90 perfiles con sus fotos y textos, el
+        número de WhatsApp Business que se va a usar, y confirmación de quién del equipo recibe
+        las conversaciones que el agente deriva a una persona.
+      </p>
+      <p>
+        Con eso se puede arrancar por la semana 1 — documentos legales y cabeceras de seguridad
+        — sin esperar al resto.
+      </p>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<footer>
+  <div>
+    <div>Auditoría y propuesta de rediseño · escortpormadrid.com</div>
+    <div>Proyecto San Benito Escorts · 5 de noviembre de 2026</div>
+  </div>
+  <div class="r">
+    <div>Documento de propuesta comercial.</div>
+    <div>No es el sitio en producción.</div>
+  </div>
+</footer>
+
+<script>
+/* Barras de la comparativa: se animan al entrar en pantalla. Sin JS quedan al 0 %
+   y la tabla de arriba ya trae los números, así que no se pierde información. */
+(function () {
+  var fills = document.querySelectorAll('.fill[data-w]');
+  if (!fills.length) return;
+  var io = 'IntersectionObserver' in window
+    ? new IntersectionObserver(function (entries) {
+        entries.forEach(function (e) {
+          if (e.isIntersecting) {
+            e.target.style.width = e.target.dataset.w + '%';
+            io.unobserve(e.target);
+          }
+        });
+      }, { threshold: 0.4 })
+    : null;
+  fills.forEach(function (f) {
+    if (io) { io.observe(f); } else { f.style.width = f.dataset.w + '%'; }
+  });
+})();
+</script>
+
+</body>
+</html>

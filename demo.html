@@ -1,0 +1,513 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Propuesta visual EPM</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;500&family=Jost:wght@300;400;500;600&display=swap">
+<style>
+:root{
+  --surface:#F5F1EA; --raised:#FBF8F3; --sunken:#EAE4DA; --inverse:#14110D;
+  --ink-strong:#14110D; --ink:#1A1611; --ink-muted:#5C5245; --ink-faint:#6B6152;
+  --brand:#7A5C33; --brand-strong:#5E4726; --brand-soft:#F0E6D8; --brand-decor:#8A6A3F; --on-brand:#FFFFFF;
+  --line:#D9D1C4; --line-strong:#8F8371; --success:#2F6B4F; --focus:#9A7647;
+  --display:"Cormorant Garamond","Iowan Old Style",Georgia,serif;
+  --sans:"Jost","Futura",ui-sans-serif,system-ui,sans-serif;
+  color-scheme:light;
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --surface:#14110D; --raised:#1E1A15; --sunken:#0E0C09; --inverse:#F5F1EA;
+    --ink-strong:#FBF8F3; --ink:#E8E2D6; --ink-muted:#A79C8A; --ink-faint:#8F8474;
+    --brand:#C9A46A; --brand-strong:#E0CDB0; --brand-soft:#2A2218; --brand-decor:#B08D5C; --on-brand:#14110D;
+    --line:#322B22; --line-strong:#6E6353; --success:#6FBF95; --focus:#B08D5C;
+    color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --surface:#14110D; --raised:#1E1A15; --sunken:#0E0C09; --inverse:#F5F1EA;
+  --ink-strong:#FBF8F3; --ink:#E8E2D6; --ink-muted:#A79C8A; --ink-faint:#8F8474;
+  --brand:#C9A46A; --brand-strong:#E0CDB0; --brand-soft:#2A2218; --brand-decor:#B08D5C; --on-brand:#14110D;
+  --line:#322B22; --line-strong:#6E6353; --success:#6FBF95; --focus:#B08D5C;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+body{
+  margin:0; background:var(--surface); color:var(--ink);
+  font-family:var(--sans); font-size:16px; line-height:1.65; letter-spacing:.01em;
+  padding-left:max(16px,env(safe-area-inset-left,0px));
+  padding-right:max(16px,env(safe-area-inset-right,0px));
+  -webkit-font-smoothing:antialiased;
+}
+.shell{max-width:78rem;margin:0 auto;padding-block:0}
+.display{font-family:var(--display);font-weight:300;letter-spacing:-.02em;color:var(--ink-strong)}
+.eyebrow{font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-faint);font-weight:500;margin:0}
+a{color:inherit;text-decoration:none}
+:focus-visible{outline:2px solid var(--focus);outline-offset:3px}
+
+/* barra de demonstração */
+.demo-bar{
+  background:var(--inverse); color:var(--surface);
+  font-size:11px; letter-spacing:.09em; text-transform:uppercase;
+  padding-block:9px; text-align:center;
+}
+.demo-bar span{opacity:.72}
+
+/* header */
+header.site{
+  position:sticky; top:0; z-index:30;
+  background:color-mix(in oklab, var(--surface) 92%, transparent);
+  backdrop-filter:blur(10px);
+  border-bottom:1px solid var(--line);
+}
+.hrow{display:flex;align-items:center;justify-content:space-between;gap:20px;height:64px}
+@media(min-width:1024px){.hrow{height:80px}}
+.wordmark{font-family:var(--display);font-size:1.5rem;letter-spacing:-.02em;color:var(--ink-strong);display:flex;align-items:center;gap:9px}
+.wordmark::after{content:"";width:5px;height:5px;border-radius:50%;background:var(--brand-decor)}
+nav.main{display:none;gap:30px}
+@media(min-width:1024px){nav.main{display:flex}}
+nav.main a{font-size:11.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-muted);transition:color .18s}
+nav.main a:hover{color:var(--brand)}
+.hright{display:flex;align-items:center;gap:10px}
+.langsw{display:flex;gap:2px;border:1px solid var(--line);border-radius:4px;padding:2px}
+.langsw a{font-size:11px;padding:4px 7px;border-radius:3px;letter-spacing:.06em;color:var(--ink-faint)}
+.langsw a[aria-current]{background:var(--brand-soft);color:var(--brand);font-weight:500}
+.btn{
+  display:inline-flex;align-items:center;justify-content:center;gap:8px;
+  border-radius:4px;padding:12px 24px;font-size:11.5px;font-weight:500;
+  letter-spacing:.09em;text-transform:uppercase;cursor:pointer;border:1px solid transparent;
+  transition:background-color .18s,color .18s,border-color .18s;
+}
+.btn-primary{background:var(--brand);color:var(--on-brand)}
+.btn-primary:hover{background:var(--brand-strong)}
+.btn-ghost{border-color:var(--line-strong);color:var(--ink)}
+.btn-ghost:hover{border-color:var(--brand);color:var(--brand)}
+.btn-sm{padding:9px 16px;font-size:10.5px}
+
+/* hero */
+.hero{padding-block:56px 76px}
+@media(min-width:1024px){.hero{padding-block:80px 100px}}
+.hero-grid{display:grid;gap:44px;align-items:end}
+@media(min-width:1024px){.hero-grid{grid-template-columns:1.12fr .88fr;gap:64px}}
+h1.hero-title{font-size:clamp(2.4rem,7vw,4.5rem);line-height:1.04;margin:16px 0 0;text-wrap:balance}
+.rule-brand{height:1px;width:52px;background:var(--brand-decor);border:0;margin:26px 0}
+.hero p.lede{font-size:1.0625rem;line-height:1.62;color:var(--ink-muted);max-width:34rem;margin:0}
+.ctas{display:flex;flex-wrap:wrap;gap:10px;padding-top:26px}
+.trust{display:flex;flex-wrap:wrap;gap:8px 24px;list-style:none;padding:22px 0 0;margin:0}
+.trust li{display:flex;align-items:center;gap:7px;font-size:12.5px;color:var(--ink-faint)}
+.trust svg{flex:none;color:var(--brand-decor)}
+.hero-figure{display:none}
+@media(min-width:1024px){.hero-figure{display:block;position:relative}}
+.ph{border-radius:6px;display:flex;align-items:center;justify-content:center}
+.hero-ph{aspect-ratio:4/5;background-image:linear-gradient(150deg,hsl(32 30% 74%),hsl(50 34% 60%),hsl(68 26% 46%))}
+:root[data-theme="dark"] .hero-ph{background-image:linear-gradient(150deg,hsl(32 20% 28%),hsl(50 24% 20%),hsl(68 16% 14%))}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .hero-ph{background-image:linear-gradient(150deg,hsl(32 20% 28%),hsl(50 24% 20%),hsl(68 16% 14%))}}
+.hero-ph::after{content:"EPM";font-family:var(--display);font-size:1.1rem;letter-spacing:.22em;color:rgba(255,255,255,.55)}
+.hero-badge{
+  position:absolute;left:-26px;bottom:34px;background:var(--raised);
+  border:1px solid var(--line);border-radius:6px;padding:16px 20px;box-shadow:0 4px 12px -2px rgb(20 17 13/.08);
+}
+.hero-badge .n{font-variant-numeric:tabular-nums;font-family:var(--display);font-size:1.9rem;line-height:1;color:var(--ink-strong)}
+.hero-badge small{display:block;padding-top:5px;font-size:10.5px;letter-spacing:.09em;text-transform:uppercase;color:var(--ink-faint)}
+
+/* secções */
+section.blk{padding-block:0 76px}
+.sec-head{display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:12px;padding-bottom:22px}
+h2.sec-title{font-family:var(--display);font-weight:300;font-size:clamp(1.7rem,4vw,2.375rem);line-height:1.18;letter-spacing:-.015em;margin:0;color:var(--ink-strong)}
+.sec-sub{font-size:13px;color:var(--ink-faint);margin:6px 0 0}
+hr.rule{height:1px;background:var(--line);border:0;margin:0 0 26px}
+.more{font-size:11.5px;letter-spacing:.09em;text-transform:uppercase;color:var(--brand);white-space:nowrap}
+.more:hover{color:var(--brand-strong)}
+
+/* grelha de perfis */
+.grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
+@media(min-width:768px){.grid{grid-template-columns:repeat(3,1fr);gap:16px}}
+@media(min-width:1100px){.grid{grid-template-columns:repeat(4,1fr);gap:20px}}
+.card{background:var(--raised);border:1px solid var(--line);border-radius:6px;overflow:hidden;transition:border-color .18s,box-shadow .18s;display:block}
+.card:hover{border-color:var(--line-strong);box-shadow:0 4px 12px -2px rgb(20 17 13/.08)}
+.card-img{position:relative;aspect-ratio:3/4;overflow:hidden}
+.card-ini{font-family:var(--display);font-size:2.2rem;color:rgba(255,255,255,.9);letter-spacing:.04em;text-shadow:0 1px 2px rgba(20,17,13,.18)}
+.badge{display:inline-flex;align-items:center;gap:6px;border-radius:999px;padding:4px 10px;font-size:10.5px;font-weight:500;letter-spacing:.05em;text-transform:uppercase}
+.badge-live{background:color-mix(in oklab,var(--success) 16%,transparent);color:var(--success)}
+.badge-appt{background:color-mix(in oklab,var(--ink-faint) 16%,transparent);color:var(--ink-muted)}
+.badge-live::before{content:"";width:5px;height:5px;border-radius:50%;background:currentColor;animation:pulse 2.4s ease-in-out infinite}
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.45;transform:scale(.82)}}
+.card-badge{position:absolute;left:8px;top:8px}
+.card-body{padding:12px 13px 14px}
+.card-name{display:flex;align-items:baseline;justify-content:space-between;gap:8px}
+.card-name h3{font-family:var(--display);font-size:1.25rem;font-weight:400;margin:0;color:var(--ink-strong);line-height:1.2}
+.card-age{font-size:12px;color:var(--ink-faint);font-variant-numeric:tabular-nums}
+.card-meta{font-size:12px;color:var(--ink-muted);margin:3px 0 0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.card-price{font-size:11.5px;color:var(--ink-faint);margin:7px 0 0}
+.card-price b{color:var(--ink);font-weight:500}
+
+/* passos */
+.steps-band{background:var(--sunken);border-block:1px solid var(--line);padding-block:68px}
+.steps{display:grid;gap:30px;list-style:none;margin:0;padding:0}
+@media(min-width:820px){.steps{grid-template-columns:repeat(3,1fr);gap:44px}}
+.steps li{min-width:0}
+.steps .num{font-size:12px;color:var(--brand-decor);font-variant-numeric:tabular-nums;letter-spacing:.06em}
+.steps h3{font-family:var(--display);font-size:1.5rem;font-weight:400;margin:9px 0 0;color:var(--ink-strong)}
+.steps p{font-size:14px;color:var(--ink-muted);margin:7px 0 0}
+
+/* concierge demo */
+.concierge-wrap{display:grid;gap:32px;align-items:start}
+@media(min-width:900px){.concierge-wrap{grid-template-columns:1fr 380px;gap:56px}}
+.panel{background:var(--raised);border:1px solid var(--line-strong);border-radius:10px;overflow:hidden;box-shadow:0 12px 32px -6px rgb(20 17 13/.12);display:flex;flex-direction:column;height:430px}
+.panel-head{border-bottom:1px solid var(--line);padding:13px 16px;display:flex;align-items:center;justify-content:space-between;gap:10px}
+.panel-head .t{font-family:var(--display);font-size:1.2rem;color:var(--ink-strong);line-height:1.2}
+.panel-head .st{font-size:11px;color:var(--ink-faint);display:flex;align-items:center;gap:5px;margin-top:2px}
+.dot{width:6px;height:6px;border-radius:50%;background:var(--success)}
+.thread{flex:1;overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:9px}
+.msg{max-width:88%;border-radius:9px;padding:9px 12px;font-size:13.5px;line-height:1.5}
+.msg.bot{background:var(--sunken);color:var(--ink);border-bottom-left-radius:3px;align-self:flex-start}
+.msg.user{background:var(--brand-soft);color:var(--ink);border-bottom-right-radius:3px;align-self:flex-end}
+.msg.sys{align-self:stretch;max-width:100%;background:transparent;border:1px dashed var(--line-strong);color:var(--ink-faint);font-size:11.5px;text-align:center;padding:8px 10px;border-radius:4px}
+.msg-form{display:flex;gap:8px;border-top:1px solid var(--line);padding:11px}
+.msg-form input{
+  flex:1;min-width:0;border:1px solid var(--line);background:var(--surface);color:var(--ink);
+  border-radius:4px;padding:9px 11px;font-family:inherit;font-size:13.5px;
+}
+.msg-form input::placeholder{color:var(--ink-faint)}
+.msg-form button{border:0;background:var(--brand);color:var(--on-brand);border-radius:4px;padding:0 16px;font-family:inherit;font-size:10.5px;letter-spacing:.09em;text-transform:uppercase;cursor:pointer;font-weight:500}
+.msg-form button:hover{background:var(--brand-strong)}
+
+/* sistema de marca */
+.brand-grid{display:grid;gap:14px}
+@media(min-width:820px){.brand-grid{grid-template-columns:repeat(3,1fr)}}
+.brand-card{background:var(--raised);border:1px solid var(--line);border-radius:6px;padding:20px}
+.brand-card h4{margin:0 0 4px;font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-faint);font-weight:600}
+.brand-card .big{font-family:var(--display);font-size:2rem;color:var(--ink-strong);margin:8px 0 0;line-height:1.1}
+.brand-card p{font-size:12.5px;color:var(--ink-muted);margin:8px 0 0}
+.swatches{display:flex;gap:6px;margin-top:14px;flex-wrap:wrap}
+.sw{width:40px;height:40px;border-radius:4px;border:1px solid var(--line);position:relative}
+.sw span{position:absolute;left:0;right:0;bottom:-17px;font-size:9px;color:var(--ink-faint);text-align:center;font-variant-numeric:tabular-nums}
+.specimen{font-family:var(--display);font-size:2.6rem;line-height:1;color:var(--ink-strong);letter-spacing:-.02em}
+
+/* footer */
+footer.site{border-top:1px solid var(--line);background:var(--sunken);padding-block:52px 40px;margin-top:76px}
+.fgrid{display:grid;gap:32px}
+@media(min-width:820px){.fgrid{grid-template-columns:1.5fr 1fr 1fr}}
+footer .wordmark{font-size:1.4rem}
+footer p.disc{font-size:13px;color:var(--ink-muted);max-width:32rem;margin:12px 0 0}
+footer .adults{display:inline-block;margin-top:14px;font-size:10.5px;letter-spacing:.06em;text-transform:uppercase;border:1px solid var(--line-strong);color:var(--ink-faint);border-radius:999px;padding:4px 11px}
+footer ul{list-style:none;margin:10px 0 0;padding:0;display:grid;gap:8px}
+footer ul a{font-size:13.5px;color:var(--ink-muted)}
+footer ul a:hover{color:var(--brand)}
+.fbottom{border-top:1px solid var(--line);margin-top:32px;padding-top:18px;font-size:11.5px;color:var(--ink-faint);display:flex;flex-wrap:wrap;gap:8px;justify-content:space-between}
+
+/* toggle tema */
+.theme-toggle{border:1px solid var(--line);background:transparent;border-radius:4px;padding:5px 8px;cursor:pointer;color:var(--ink-faint);font-size:11px;font-family:inherit;line-height:1}
+.theme-toggle:hover{color:var(--brand);border-color:var(--brand)}
+
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation-duration:.01ms!important;transition-duration:.01ms!important}
+}
+</style>
+</head>
+<body>
+
+<div class="demo-bar">Propuesta de rediseño · <span>no es el sitio en producción</span> · <a href="./" style="color:inherit;text-decoration:underline;text-underline-offset:2px">volver al informe</a></div>
+
+<header class="site">
+  <div class="shell hrow">
+    <a href="#" class="wordmark">EscortPorMadrid</a>
+    <nav class="main" aria-label="Principal">
+      <a href="#seleccion">Acompañantes</a>
+      <a href="#proceso">Experiencias</a>
+      <a href="#marca">La agencia</a>
+      <a href="#concierge">Contacto</a>
+    </nav>
+    <div class="hright">
+      <button class="theme-toggle" id="themeBtn" type="button" aria-label="Cambiar tema">◐</button>
+      <div class="langsw" role="group" aria-label="Idioma">
+        <a href="#" aria-current="true">ES</a><a href="#">EN</a><a href="#">FR</a>
+      </div>
+      <a href="#concierge" class="btn btn-primary btn-sm">Hablar por WhatsApp</a>
+    </div>
+  </div>
+</header>
+
+<main>
+  <!-- HERO -->
+  <section class="shell hero">
+    <div class="hero-grid">
+      <div>
+        <p class="eyebrow">Agencia de acompañamiento de lujo · Madrid</p>
+        <h1 class="display hero-title">Compañía elegida con criterio</h1>
+        <hr class="rule-brand">
+        <p class="lede">
+          Una selección reducida de acompañantes verificadas en Madrid. Discreción absoluta,
+          trato personal y reservas atendidas por personas reales.
+        </p>
+        <div class="ctas">
+          <a href="#seleccion" class="btn btn-primary">Ver la selección</a>
+          <a href="#concierge" class="btn btn-ghost">Hablar por WhatsApp</a>
+        </div>
+        <ul class="trust">
+          <li><svg width="12" height="12" viewBox="0 0 12 12" aria-hidden="true"><path d="M2.5 6.2l2.2 2.2L9.5 3.6" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>Verificación de identidad</li>
+          <li><svg width="12" height="12" viewBox="0 0 12 12" aria-hidden="true"><path d="M2.5 6.2l2.2 2.2L9.5 3.6" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>Discreción garantizada</li>
+          <li><svg width="12" height="12" viewBox="0 0 12 12" aria-hidden="true"><path d="M2.5 6.2l2.2 2.2L9.5 3.6" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>Atención 7 días</li>
+        </ul>
+      </div>
+      <div class="hero-figure">
+        <div class="ph hero-ph"></div>
+        <div class="hero-badge">
+          <p class="n">8</p>
+          <small>perfiles disponibles</small>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SELECCIÓN -->
+  <section class="shell blk" id="seleccion">
+    <div class="sec-head">
+      <div>
+        <h2 class="sec-title">Selección de acompañantes en Madrid</h2>
+        <p class="sec-sub">8 perfiles disponibles</p>
+      </div>
+      <a href="#" class="more">Ver todas →</a>
+    </div>
+    <hr class="rule">
+    <div class="grid" id="cards"></div>
+  </section>
+
+  <!-- PROCESO -->
+  <section class="steps-band" id="proceso">
+    <div class="shell">
+      <h2 class="sec-title">Tres pasos, ninguna fricción</h2>
+      <hr class="rule-brand" style="margin:22px 0 34px">
+      <ol class="steps">
+        <li>
+          <span class="num">01</span>
+          <h3>Elige</h3>
+          <p>Revisa la selección y guarda los perfiles que te interesan.</p>
+        </li>
+        <li>
+          <span class="num">02</span>
+          <h3>Escribe</h3>
+          <p>Cuéntanos qué buscas. Te responde el concierge, a cualquier hora.</p>
+        </li>
+        <li>
+          <span class="num">03</span>
+          <h3>Confirma</h3>
+          <p>Un operador cierra los detalles contigo, con total discreción.</p>
+        </li>
+      </ol>
+    </div>
+  </section>
+
+  <!-- CONCIERGE -->
+  <section class="shell blk" id="concierge" style="padding-top:76px">
+    <div class="concierge-wrap">
+      <div>
+        <p class="eyebrow">Atendimiento automático</p>
+        <h2 class="sec-title" style="margin-top:14px">El concierge responde a las 3 de la mañana</h2>
+        <hr class="rule-brand">
+        <p style="font-size:15px;color:var(--ink-muted);max-width:32rem;margin:0 0 14px">
+          Un solo agente atiende WhatsApp, Telegram y el chat del sitio. Consulta el catálogo
+          real, informa tarifas de referencia y nunca inventa disponibilidad.
+        </p>
+        <p style="font-size:15px;color:var(--ink-muted);max-width:32rem;margin:0 0 14px">
+          Cuando el asunto necesita a una persona — precio, cerrar reserva, una queja —
+          la conversación pasa al equipo con el resumen ya escrito.
+        </p>
+        <p style="font-size:13px;color:var(--ink-faint);max-width:32rem;margin:0">
+          Prueba a escribir «precio» o «quiero reservar» en el panel para ver la derivación.
+        </p>
+      </div>
+
+      <div class="panel">
+        <div class="panel-head">
+          <div>
+            <p class="t">Concierge</p>
+            <p class="st"><span class="dot"></span> En línea</p>
+          </div>
+          <span class="eyebrow" style="font-size:10px">demo</span>
+        </div>
+        <div class="thread" id="thread" aria-live="polite"></div>
+        <form class="msg-form" id="chatForm">
+          <label for="chatInput" class="sr-only" style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)">Escribe tu consulta</label>
+          <input id="chatInput" placeholder="Escribe tu consulta…" autocomplete="off" maxlength="200">
+          <button type="submit">Enviar</button>
+        </form>
+      </div>
+    </div>
+  </section>
+
+  <!-- SISTEMA DE MARCA -->
+  <section class="shell blk" id="marca">
+    <div class="sec-head">
+      <div>
+        <h2 class="sec-title">El sistema visual</h2>
+        <p class="sec-sub">Bronce sobre papel hueso · tema oscuro nativo</p>
+      </div>
+    </div>
+    <hr class="rule">
+    <div class="brand-grid">
+      <div class="brand-card">
+        <h4>Color</h4>
+        <div class="swatches">
+          <div class="sw" style="background:#7A5C33"><span>7A5C33</span></div>
+          <div class="sw" style="background:#8A6A3F"><span>8A6A3F</span></div>
+          <div class="sw" style="background:#F0E6D8"><span>F0E6D8</span></div>
+          <div class="sw" style="background:#F5F1EA"><span>F5F1EA</span></div>
+          <div class="sw" style="background:#14110D"><span>14110D</span></div>
+        </div>
+        <p style="margin-top:24px">Contraste verificado en WCAG AA. Ningún texto por debajo de 4,5:1.</p>
+      </div>
+      <div class="brand-card">
+        <h4>Tipografía</h4>
+        <p class="specimen" style="margin-top:12px">Aa</p>
+        <p style="margin-top:10px"><b style="color:var(--ink)">Cormorant Garamond</b> para títulos, con Jost para el texto. Escala de 12 a 72 px con interlineado decreciente.</p>
+      </div>
+      <div class="brand-card">
+        <h4>Imagen</h4>
+        <div class="ph" style="aspect-ratio:16/9;background-image:linear-gradient(145deg,hsl(28 24% 82%),hsl(46 30% 74%))">
+          <span style="font-family:var(--display);font-size:1.1rem;color:rgba(255,255,255,.7)">AM</span>
+        </div>
+        <p style="margin-top:12px">Proporción 3:4 fija. Placeholder generado por hash del nombre: cada perfil tiene su color antes de que llegue la foto.</p>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer class="site">
+  <div class="shell">
+    <div class="fgrid">
+      <div>
+        <a href="#" class="wordmark">EscortPorMadrid</a>
+        <p class="disc">EscortPorMadrid es una agencia de acompañamiento. Toda la información publicada es para mayores de 18 años.</p>
+        <span class="adults">Contenido solo para mayores de 18 años</span>
+      </div>
+      <div>
+        <p class="eyebrow">Legal</p>
+        <ul>
+          <li><a href="#">Aviso legal</a></li>
+          <li><a href="#">Privacidad</a></li>
+          <li><a href="#">Cookies</a></li>
+          <li><a href="#">Condiciones</a></li>
+        </ul>
+      </div>
+      <div>
+        <p class="eyebrow">Contacto</p>
+        <ul>
+          <li><a href="#">WhatsApp</a></li>
+          <li><a href="#">Telegram</a></li>
+          <li><a href="#">hola@escortpormadrid.com</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="fbottom">
+      <span>© 2026 EscortPorMadrid. Todos los derechos reservados.</span>
+      <span>Madrid, España</span>
+    </div>
+  </div>
+</footer>
+
+<script>
+/* ── Placeholder determinístico: mesmo nome → sempre a mesma cor ── */
+function hash(str){let h=0x811c9dc5;for(let i=0;i<str.length;i++){h^=str.charCodeAt(i);h=Math.imul(h,0x01000193);}return h>>>0;}
+function hue(slug){const hues=[28,34,40,22,46,16,52,32];return hues[hash(slug)%hues.length];}
+
+const PROFILES=[
+  {n:"Amaya",a:27,area:"Salamanca",nat:"Española",live:true,rate:250},
+  {n:"Emma",a:29,area:"Chamberí",nat:"Británica",live:true,rate:300},
+  {n:"Julia",a:26,area:"Retiro",nat:"Argentina",live:false,rate:220},
+  {n:"Carla",a:31,area:"Justicia",nat:"Italiana",live:true,rate:280},
+  {n:"Nadia",a:24,area:"Malasaña",nat:"Francesa",live:false,rate:240},
+  {n:"Irene",a:33,area:"Serrano",nat:"Española",live:true,rate:350},
+  {n:"Sofía",a:28,area:"La Latina",nat:"Colombiana",live:true,rate:200},
+  {n:"Elena",a:30,area:"Almagro",nat:"Rusa",live:false,rate:320}
+];
+
+const dark = () => document.documentElement.dataset.theme === 'dark'
+  || (!document.documentElement.dataset.theme && matchMedia('(prefers-color-scheme:dark)').matches);
+
+function gradient(h){
+  return dark()
+    ? `linear-gradient(150deg,hsl(${h} 20% 30%) 0%,hsl(${h+18} 24% 20%) 58%,hsl(${h+36} 16% 14%) 100%)`
+    : `linear-gradient(150deg,hsl(${h} 30% 74%) 0%,hsl(${h+18} 34% 60%) 58%,hsl(${h+36} 26% 46%) 100%)`;
+}
+
+const cards = document.getElementById('cards');
+
+function drawCards(){
+  cards.innerHTML = PROFILES.map(p=>{
+    const h = hue(p.n.toLowerCase());
+    return `<a href="#" class="card">
+      <div class="card-img ph" style="background-image:${gradient(h)}">
+        <span class="card-ini">${p.n.slice(0,1)}</span>
+        <div class="card-badge">
+          ${p.live
+            ? '<span class="badge badge-live">Disponible ahora</span>'
+            : '<span class="badge badge-appt">Con cita previa</span>'}
+        </div>
+      </div>
+      <div class="card-body">
+        <div class="card-name"><h3>${p.n}</h3><span class="card-age">${p.a}</span></div>
+        <p class="card-meta">${p.nat} · ${p.area}</p>
+        <p class="card-price">desde <b>${p.rate} €</b></p>
+      </div>
+    </a>`;
+  }).join('');
+}
+
+/* Tema: preferência salva vence; o botão alterna */
+try{
+  const saved = localStorage.getItem('demo-theme');
+  if(saved) document.documentElement.dataset.theme = saved;
+}catch(e){}
+
+drawCards();
+
+document.getElementById('themeBtn').addEventListener('click',()=>{
+  const next = dark() ? 'light' : 'dark';
+  document.documentElement.dataset.theme = next;
+  try{localStorage.setItem('demo-theme',next);}catch(e){}
+  drawCards();
+});
+
+/* ── Concierge (demo de flujo, sin backend) ── */
+const thread = document.getElementById('thread');
+const form = document.getElementById('chatForm');
+const input = document.getElementById('chatInput');
+
+function add(text, kind){
+  const el = document.createElement('div');
+  el.className = 'msg ' + kind;
+  el.textContent = text;
+  thread.appendChild(el);
+  thread.scrollTop = thread.scrollHeight;
+}
+
+add('Hola, soy el concierge de EscortPorMadrid. ¿En qué puedo ayudarte?','bot');
+
+const HANDOFF = /(precio|tarifa|cu[aá]nto|reserv|cerrar|cita|descuento|barato)/i;
+
+form.addEventListener('submit', e=>{
+  e.preventDefault();
+  const text = input.value.trim();
+  if(!text) return;
+  add(text,'user');
+  input.value='';
+
+  setTimeout(()=>{
+    if(HANDOFF.test(text)){
+      add('Claro. El operador que lleva la agenda de Amaya te responde en unos minutos con la tarifa exacta y la disponibilidad de hoy.','bot');
+      add('Conversación derivada al equipo · resumen y respuesta sugerida enviados al Telegram interno','sys');
+    } else if(/hola|buenas|hey/i.test(text)){
+      add('Hola. ¿Buscas compañía para una cena, un evento o un encuentro? Te propongo perfiles según lo que prefieras.','bot');
+    } else if(/ingl[eé]s|english|franc[eé]s|français/i.test(text)){
+      add('Tenemos perfiles que hablan inglés y francés. Dime qué zona de Madrid te viene mejor y te paso tres opciones.','bot');
+    } else {
+      add('Puedo mostrarte perfiles disponibles ahora mismo en Madrid, contarte cómo funciona el proceso o pasarte la tarifa de referencia. ¿Por dónde empezamos?','bot');
+    }
+  }, 620);
+});
+</script>
+</body>
+</html>
